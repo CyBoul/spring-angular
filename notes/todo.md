@@ -1,0 +1,6 @@
+- Password encryption -> Bcrypt
+- Time of Tokens
+- Role based access
+- CORS config
+- Import Bootstrap/PrimeNg
+- Create the login page

@@ -1,16 +1,11 @@
-[< Back](README.md)
+[< Back](../README.md)
 
 ### Changes
 
-#### ✔ Init a basic spring-boot project
-- Generate starter with [Spring Initializr](https://start.spring.io/)
-- Start with some `RestController`
+- Init a basic spring-boot project ✔
+- Connect to H2 database ✔
+- Change inMem DB by dockerized postgres ✔
 
-#### ✔ Connect to a database
-- Use `H2` inMemoryDB (temp)
-    - Play with JDBC and Repositories
-    - Add some unit and integration tests
-- Change `H2` by dockerized `Postgres`
 ```compose.yaml
 services:
     postgres:
@@ -22,15 +17,7 @@ services:
         ports:
             - '5432:5432'
 ```
-All we need is this `compose.yaml` and adding `spring-boot-docker-compose` to the pom dependencies.
 ```pom.xml
-...
-<!-- <dependency>-->
-<!--	<groupId>com.h2database</groupId>-->
-<!--    <artifactId>h2</artifactId>-->
-<!--    <scope>runtime</scope>-->
-<!-- </dependency>-->
-
 <dependency>
     <groupId>org.postgresql</groupId>
     <artifactId>postgresql</artifactId>
@@ -44,18 +31,13 @@ All we need is this `compose.yaml` and adding `spring-boot-docker-compose` to th
     <scope>runtime</scope>
     <optional>true</optional>
 </dependency>
-...
 ```
 
 ---
 
-### ✔ Web Interface
-
-#### ✔ Play with Thymeleaf
-- Add `Spring-secu` + `Thymeleaf` for minimal login views \
-
-#### ✔ Prepare for Angular
-- Create modules + Fix POMs
+### Web Interface
+- Prepare for Angular: Create modules ✔
+- Fix POMs  ✔
 ```
 /my-app
 │
@@ -80,19 +62,16 @@ All we need is this `compose.yaml` and adding `spring-boot-docker-compose` to th
     ├── tsconfig.json
     └── src/
 ```
-- Create a minimal Angular app
+- Create a minimal Angular app ✔
 ```
 cd Playground
 ng new frontend --minimal
 ```
-- Replace `Thymeleaf` views by a redirection to `Angular` SPA entrypoint
-- Remove `Thymeleaf` dependencies
-- Configure maven with plugins for build automation
+- Configure maven with plugins for build automation ✔
   - tell maven to install node + dependencies + build `Angular` module (frontend.pom)
   - then, copy the build output to the backend (backend.pom)
   - make sure the front build before back (parent.pom)
 ```frontend.pom
-...
     <build>
         <plugins>
             <plugin>
@@ -136,10 +115,8 @@ ng new frontend --minimal
             </plugin>
         </plugins>
     </build>
-...
 ```
 ```backend.pom
-...
   <build>
         <plugins>
             ...
@@ -171,7 +148,6 @@ ng new frontend --minimal
             ...
         </plugins>
     </build>
-...
 ```
 so now ``mvnw i`` from the project folder will :
 - build the frontend
@@ -180,23 +156,21 @@ so now ``mvnw i`` from the project folder will :
 
 _The modules' order declared in the parent POM define the order for build executions_
 ```parent.pom
-...
     <modules>
         <module>frontend</module>
         <module>backend</module>
     </modules>
-...
 ```
 
-
 ---
-
+### Authentication
 #### Use JWT to secure the API
 - Backend
-  - ✔ Create tool class for JWT validation & token
-  - ✔ Change to **stateless** authentication in `Spring-secu` config
-  - ✔ Create a `Filter` (interceptor) to validate requests
-  - ✔ Create an AuthenticationController for login call
+  - Create tool class for JWT validation & token ✔
+  - Change to **stateless** authentication in `Spring-secu` config ✔
+  - Create a `Filter` (interceptor) to validate requests ✔
+  - Create an AuthenticationController for login call ✔
+  - Test the Authentication with curl ✔
 ```shell
 curl -i http://localhost:8080/api/gugu
 HTTP/1.1 403
@@ -242,6 +216,5 @@ Content-Type: application/json
 # Successful fetching data 
 ```
 
-
 - Front
-  -  _next_ >> Create http-interceptor to inject token in API calls 
+  - Create http-interceptor to inject token in API calls ✔ 
