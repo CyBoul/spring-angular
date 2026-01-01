@@ -7,7 +7,9 @@ import com.cyboul.demo.model.user.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +32,12 @@ public class JsonDataLoader implements CommandLineRunner {
     private final ObjectMapper objMapper;
     private final PasswordEncoder encoder;
 
+    @Value("classpath:data/Pets.json")
+    private Resource petsResource;
+
+    @Value("classpath:data/Users.json")
+    private Resource usersResource;
+
     public JsonDataLoader(UserRepository userRepository, PetRepository petRepository, ObjectMapper objMapper, PasswordEncoder encoder) {
         this.userRepository = userRepository;
         this.petRepository = petRepository;
@@ -38,19 +46,19 @@ public class JsonDataLoader implements CommandLineRunner {
     }
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
         createPets();
         createUsers();
     }
 
     private void createUsers() {
-        if( userRepository.findAll().isEmpty() ){
-            try (InputStream is = getClass().getResourceAsStream("/data/users.json")){
+        if( userRepository.findAll().isEmpty() ) {
+            try (InputStream is = usersResource.getInputStream()) {
                 Users users = objMapper.readValue(is, Users.class);
                 users.users().forEach(u -> {
                     String raw = u.getPassword();
                     u.setPassword(encoder.encode(raw));
-                    log.info("encoding: " + raw + " as: " + u.getPassword());
+                    //log.info("encoding: " + raw + " as: " + u.getPassword());
                 });
                 log.info("Reading and injecting {} users from JSON into the database", users.users().size());
                 userRepository.saveAll(users.users());
@@ -65,7 +73,7 @@ public class JsonDataLoader implements CommandLineRunner {
 
     private void createPets() {
         if( petRepository.findAll().isEmpty() ){
-            try (InputStream is = getClass().getResourceAsStream("/data/pets.json")){
+            try (InputStream is = petsResource.getInputStream()) {
                 Pets pets = objMapper.readValue(is, Pets.class);
                 log.info("Reading and injecting {} pets from JSON into the database", pets.pets().size());
                 petRepository.saveAll(pets.pets());
