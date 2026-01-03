@@ -4,6 +4,6 @@ services:
     environment:
       - 'POSTGRES_DB=theotherdatasource'
       - 'POSTGRES_PASSWORD=password'
-      - 'POSTGRES_USER=cyb'
+      - 'POSTGRES_USER=admin'
     ports:
       - '5432:5432'

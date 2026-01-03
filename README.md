@@ -5,7 +5,7 @@ This is my little corner of the internet where I tinker, break things, and (some
 - `Node 24.6.0` `Npm 11.5.2` `Angular 20.2.1`
 - `Postgres 42.7.4` `Docker`
 
-[📝 Change logs](notes/progress.md)
+[>> Change logs](notes/progress.md)
 
     
 
