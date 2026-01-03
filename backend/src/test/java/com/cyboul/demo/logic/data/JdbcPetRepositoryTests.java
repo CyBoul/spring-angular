@@ -1,6 +1,6 @@
 package com.cyboul.demo.logic.data;
 
-import com.cyboul.demo.logic.data.disabled.JdbcPetRepository;
+import com.cyboul.demo.logic.disabled.JdbcPetRepository;
 import com.cyboul.demo.model.pet.Animal;
 import com.cyboul.demo.model.pet.Pet;
 import org.junit.jupiter.api.BeforeEach;

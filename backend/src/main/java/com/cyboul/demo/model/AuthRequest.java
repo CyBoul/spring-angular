@@ -1,4 +1,4 @@
-package com.cyboul.demo.model.dto;
+package com.cyboul.demo.model;
 
 import jakarta.validation.constraints.NotEmpty;
 

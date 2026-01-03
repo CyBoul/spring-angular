@@ -1,7 +1,7 @@
 //package com.cyboul.demo.exec;
 //
 //
-//import com.cyboul.demo.logic.data.disabled.UserRestClient;
+//import com.cyboul.demo.logic.disabled.UserRestClient;
 //import com.cyboul.demo.model.externals.Address;
 //import com.cyboul.demo.model.externals.Company;
 //import com.cyboul.demo.model.externals.Geo;

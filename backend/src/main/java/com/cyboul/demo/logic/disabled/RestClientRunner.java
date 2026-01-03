@@ -1,6 +1,5 @@
-package com.cyboul.demo.logic.exec;
+package com.cyboul.demo.logic.disabled;
 
-import com.cyboul.demo.logic.data.UserHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;

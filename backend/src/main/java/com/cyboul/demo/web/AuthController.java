@@ -1,7 +1,7 @@
 package com.cyboul.demo.web;
 
 import com.cyboul.demo.logic.service.UserService;
-import com.cyboul.demo.model.dto.AuthRequest;
+import com.cyboul.demo.model.AuthRequest;
 import com.cyboul.demo.logic.service.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
