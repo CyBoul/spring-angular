@@ -1,5 +1,6 @@
 package com.cyboul.demo.logic.service;
 
+
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -9,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
+
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 
 @Component
@@ -17,15 +21,19 @@ public class JwtService {
     private final long expiration;
     private final SecretKey secretKey;
     private final JwtParser parser;
+    private final Clock clock;
 
     public JwtService(
             @Value("${demo.jwt.secret}") String secret,
-            @Value("${demo.jwt.expiration:3600000}") long expiration
+            @Value("${demo.jwt.expiration:3600000}") long expiration,
+            Clock clock
     ){
         if (secret == null || secret.length() < 32) {
             throw new IllegalStateException("JWT secret must be at least 32 characters");
         }
         this.expiration = expiration;
+
+        this.clock = clock;
         // secret is base64 encoded
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         this.parser = Jwts.parserBuilder()
@@ -34,10 +42,13 @@ public class JwtService {
     }
 
     public String generateToken(String username) {
+        // clock.instant() = more deterministic for Tests
+        // new Date() replaced by Date.From(fixedInstant)
+        Instant now = clock.instant();
         return Jwts.builder()
                 .setSubject(username)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(now.plusMillis(expiration)))
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -60,6 +71,8 @@ public class JwtService {
                 .getBody()
                 .getExpiration();
 
-        return expiration.before(new Date());
+        // clock.instant() = more deterministic for Tests
+        // new Date() comparison replaced by fixed instant comparison
+        return expiration.toInstant().isBefore(clock.instant());
     }
 }
