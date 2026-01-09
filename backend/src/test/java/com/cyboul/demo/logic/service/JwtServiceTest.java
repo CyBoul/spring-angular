@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JwtServiceTests {
+public class JwtServiceTest {
 
     @Test
     public void generateToken_shouldContainUsernameAndExpiration(){
@@ -50,7 +50,7 @@ public class JwtServiceTests {
     @Test
     public void validateToken_shouldReturnTrue_whenUsernameMatchesAndTokenNotExpired(){
 
-        // Arrange
+
         long ttl = 60_000L;
         Instant fixedInstant = Instant.parse("2025-01-01T10:00:00Z");
         Clock clock = Clock.fixed(fixedInstant, ZoneOffset.UTC);
@@ -64,17 +64,14 @@ public class JwtServiceTests {
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn(username);
 
-        // Act
         boolean isValid = jwtService.validateToken(token, userDetails);
 
-        // Assert
         assertTrue(isValid);
     }
 
     @Test
     public void validateToken_shouldReturnFalse_whenTokenExpired(){
 
-        // Arrange
         long ttl = 60_000L;
         Instant t0 = Instant.parse("2025-01-01T10:00:00Z");
         Clock clock = Clock.fixed(t0, ZoneOffset.UTC);
@@ -89,18 +86,15 @@ public class JwtServiceTests {
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn(username);
 
-        // Act
         boolean isValid = new JwtService(secret, ttl, validClock)
                 .validateToken(expiredToken, userDetails);
 
-        // Assert
         assertFalse(isValid);
     }
 
     @Test
     public void validateToken_shouldReturnFalse_whenUsernameNotMatching(){
 
-        // Arrange
         long ttl = 60_000L;
         Instant t0 = Instant.parse("2025-01-01T10:00:00Z");
         Clock clock = Clock.fixed(t0, ZoneOffset.UTC);
@@ -115,10 +109,8 @@ public class JwtServiceTests {
         UserDetails userDetails = mock(UserDetails.class);
         when(userDetails.getUsername()).thenReturn(username);
 
-        // Act
         boolean isValid = jwtService.validateToken(tokenWithWrongUsername, userDetails);
 
-        // Assert
         assertFalse(isValid);
     }
 
