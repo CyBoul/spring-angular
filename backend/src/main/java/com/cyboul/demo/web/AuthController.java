@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,16 +25,20 @@ public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    private final UserService userService;
+    //private final UserService userService;
+    private final UserDetailsService userDetailsService;
+
 
     public AuthController(
             AuthenticationManager authManager,
             JwtService jwtService,
-            UserService userService
+//            UserService userService
+            UserDetailsService userDetailsService
     ){
         this.authManager = authManager;
         this.jwtService = jwtService;
-        this.userService = userService;
+//        this.userService = userService;
+        this.userDetailsService = userDetailsService;
     }
 
     @PostMapping("/auth/login")
@@ -47,7 +52,8 @@ public class AuthController {
             log.error("Login attempt failed for '{}' : {}", request.email(), e.getMessage());
             return ResponseEntity.badRequest().build();
         }
-        UserDetails userDetails = userService.loadUserByEmail(request.email());
+//        UserDetails userDetails = userService.loadUserByEmail(request.email());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
         String jwt = jwtService.generateToken(userDetails.getUsername());
         return ResponseEntity.ok(Collections.singletonMap("token", jwt));
     }
