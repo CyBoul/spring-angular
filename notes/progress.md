@@ -14,6 +14,7 @@
 
 ### Latest changes
 
+- JwtService unit & integration tests (PASS)
 - Bcrypt encryption for passwords ✔
 - Create an http-interceptor to inject token in API calls from front ✔
 
