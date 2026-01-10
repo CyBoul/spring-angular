@@ -36,6 +36,7 @@ public class JwtServiceTest {
         Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
         Date expire = Jwts.parserBuilder()
                 .setSigningKey(key)
+                .setClock(() -> Date.from(clock.instant()))
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
