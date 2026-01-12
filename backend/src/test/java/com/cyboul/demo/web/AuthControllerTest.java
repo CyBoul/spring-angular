@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -28,8 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerTest {
 
     @Autowired private MockMvc mockMvc;
+    @MockBean private UserDetailsService userService;
     @MockBean private JwtService jwtService;
-    @MockBean private UserService userService;
     @MockBean private AuthenticationManager authenticationManager;
 
     @Test
@@ -47,7 +48,7 @@ public class AuthControllerTest {
 
         Authentication auth = mock(Authentication.class);
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(auth);
-        when(userService.loadUserByEmail(email)).thenReturn(user);
+        when(userService.loadUserByUsername(email)).thenReturn(user);
         when(jwtService.generateToken(email)).thenReturn(expectedToken);
 
         // Act + Assert
