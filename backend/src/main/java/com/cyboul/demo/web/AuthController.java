@@ -1,11 +1,11 @@
 package com.cyboul.demo.web;
 
-import com.cyboul.demo.logic.service.UserService;
 import com.cyboul.demo.model.AuthRequest;
 import com.cyboul.demo.logic.service.JwtService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -47,7 +47,8 @@ public class AuthController {
                             request.email(), request.password()));
         } catch (BadCredentialsException e){
             log.error("Login attempt failed for '{}'", request.email());
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("error", "Invalid credentials"));
         }
         UserDetails userDetails = userService.loadUserByUsername(request.email());
         String jwt = jwtService.generateToken(userDetails.getUsername());

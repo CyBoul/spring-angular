@@ -29,8 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class AuthControllerTest {
 
     @Autowired private MockMvc mockMvc;
-    @MockBean private UserDetailsService userService;
     @MockBean private JwtService jwtService;
+    @MockBean private UserDetailsService userService;
     @MockBean private AuthenticationManager authenticationManager;
 
     @Test
@@ -79,7 +79,23 @@ public class AuthControllerTest {
                               "password": "wrongPassword"
                             }
                             """))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isUnauthorized());
 
+    }
+    @Test
+    void login_shouldReturnBadRequest_whenUserDoesNotExist() throws Exception {
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(BadCredentialsException.class);
+
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                          "email": "unknown@mail.com",
+                          "password": "password"
+                        }
+                        """))
+                .andExpect(status().isUnauthorized());
     }
 }
