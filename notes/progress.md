@@ -1,49 +1,43 @@
 [<< Readme](../README.md)
 
-### ToDo List
+This file tracks the technical progress and decisions made during the development of this project.
+It is intentionally informal and focuses on implementation steps and learning milestones.
 
-- Redo Tests !!!
-- CORS config
-- Time of Tokens
-- Import Bootstrap/PrimeNg
-- Create the login page
-- Role based access
-- ...
+### Planned Improvements
+
+Non-exhaustive list of upcoming technical and functional improvements:
+
+- CORS configuration and security hardening
+- Token lifetime and refresh strategy
+- UI integration (Bootstrap / PrimeNG)
+- Login page implementation
+- Role-based access control
 
 ---
 
-### Latest changes
+### Recent Changes
 
-- JwtService unit & integration tests (PASS)
-- Bcrypt encryption for passwords ✔
-- Create an http-interceptor to inject token in API calls from front ✔
+- Unit and integration tests for AuthController
+- Unit and integration tests for JwtService
+- Password hashing using BCrypt
+- HTTP interceptor to inject JWT into frontend API calls
 
 ---
 
 ### Authentication / JWT
 
-- Create a service for `JWT` tokens & validation ✔
-- Create a filter (interceptor) to validate requests ✔
-- Create a controller for authentication calls ✔
-- Tests with `curl` ([see curl.md](curl.md)) ✔
+Implemented authentication flow using JWT:
+
+- Dedicated service for token creation and validation
+- HTTP filter / interceptor for request validation
+- Authentication controller
+- Manual validation using `curl` ([see curl.md](curl.md))
 
 ---
 
-### Project init
+### Project Initialization
 
-- Init a basic spring-boot project ✔
-- Dockerized postgres ([see compose.yml](../compose.yml)) ✔
-- Prepare for Angular: Create modules ([see structure.md](structure.md)) ✔
-- Prepare for Angular: Fix POMs  ✔
-- Create a minimal Angular app ✔
-  ```
-  cd project_folder
-  ng new frontend --minimal
-  ```
-- Configure maven build automation ✔
-
-_``mvn install`` from the project folder will :_
-- _download and install node (once)_
-- _build the frontend_
-- _copy build output from front module to the ``static`` resource folder of back module_
-- _build the backend_
+- Spring Boot backend initialization
+- PostgreSQL setup with Docker ([see compose.yml](../compose.yml))
+- Angular project setup and module preparation
+- Maven build automation for full-stack packaging
