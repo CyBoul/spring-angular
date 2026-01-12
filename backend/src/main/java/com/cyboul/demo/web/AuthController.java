@@ -3,6 +3,7 @@ package com.cyboul.demo.web;
 import com.cyboul.demo.logic.service.UserService;
 import com.cyboul.demo.model.AuthRequest;
 import com.cyboul.demo.logic.service.JwtService;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -25,35 +26,30 @@ public class AuthController {
 
     private final AuthenticationManager authManager;
     private final JwtService jwtService;
-    //private final UserService userService;
-    private final UserDetailsService userDetailsService;
-
+    private final UserDetailsService userService;
 
     public AuthController(
             AuthenticationManager authManager,
             JwtService jwtService,
-//            UserService userService
-            UserDetailsService userDetailsService
+            UserDetailsService userService
     ){
         this.authManager = authManager;
         this.jwtService = jwtService;
-//        this.userService = userService;
-        this.userDetailsService = userDetailsService;
+        this.userService = userService;
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Map<String,String>> login(@RequestBody AuthRequest request){
+    public ResponseEntity<Map<String,String>> login(@RequestBody @Valid AuthRequest request){
         log.info("Login attempt '{}'", request.email()); // toRmv
         try {
             authManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             request.email(), request.password()));
         } catch (BadCredentialsException e){
-            log.error("Login attempt failed for '{}' : {}", request.email(), e.getMessage());
+            log.error("Login attempt failed for '{}'", request.email());
             return ResponseEntity.badRequest().build();
         }
-//        UserDetails userDetails = userService.loadUserByEmail(request.email());
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
+        UserDetails userDetails = userService.loadUserByUsername(request.email());
         String jwt = jwtService.generateToken(userDetails.getUsername());
         return ResponseEntity.ok(Collections.singletonMap("token", jwt));
     }
