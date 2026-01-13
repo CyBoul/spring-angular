@@ -34,6 +34,8 @@ The focus is not on delivering a finished product, but on:
 - Preference for simple, readable design over premature abstraction
 - SOLID principles used as guidelines, not strict rules
 
+> Progress and technical notes: [Change log](notes/progress.md)
+
 ---
 
 ### Build

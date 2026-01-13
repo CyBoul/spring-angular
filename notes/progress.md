@@ -33,11 +33,10 @@ Implemented authentication flow using JWT:
 - Authentication controller
 - Manual validation using `curl` ([see curl.md](curl.md))
 
----
 
 ### Project Initialization
 
 - Spring Boot backend initialization
 - PostgreSQL setup with Docker ([see compose.yml](../compose.yml))
-- Angular project setup and module preparation
+- Angular project setup and module preparation ([see structure.md](structure.md))
 - Maven build automation for full-stack packaging
