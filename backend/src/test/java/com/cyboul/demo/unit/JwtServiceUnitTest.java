@@ -1,5 +1,6 @@
-package com.cyboul.demo.logic.service;
+package com.cyboul.demo.unit;
 
+import com.cyboul.demo.logic.service.JwtService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -17,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class JwtServiceTest {
+public class JwtServiceUnitTest {
 
     @Test
     public void generateToken_shouldContainUsernameAndExpiration(){

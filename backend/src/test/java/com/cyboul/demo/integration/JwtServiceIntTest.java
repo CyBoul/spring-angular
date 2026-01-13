@@ -1,6 +1,7 @@
-package com.cyboul.demo.logic.service;
+package com.cyboul.demo.integration;
 
 import com.cyboul.demo.config.JwtTestConfig;
+import com.cyboul.demo.logic.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

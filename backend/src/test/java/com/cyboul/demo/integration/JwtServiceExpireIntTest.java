@@ -1,11 +1,11 @@
-package com.cyboul.demo.logic.service;
+package com.cyboul.demo.integration;
 
 import com.cyboul.demo.config.JwtTestConfig;
+import com.cyboul.demo.logic.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ContextConfiguration(classes = { JwtTestConfig.class })
 @TestPropertySource(
         locations = { "classpath:application-test.properties" },
-        properties = { "demo.jwt.expiration=1" } // override
+        properties = { "demo.jwt.expiration=1" } // override .properties
 )
 @ActiveProfiles("test")
 public class JwtServiceExpireIntTest {

@@ -5,11 +5,9 @@ import com.cyboul.demo.logic.service.JwtService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.Mockito.when;
@@ -18,19 +16,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /*
- * Slice MVC (Integration without DB)
+ * Slice MVC / Partial Integration (without DB, Repo, JPA)
  */
 
-//@SpringBootTest()
-@WebMvcTest(controllers = AuthController.class)
+@WebMvcTest(AuthController.class)
 @Import(TestSecurityConfig.class)
-@ActiveProfiles("test")
-public class AuthControllerIntTest {
+public class AuthControllerWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private JwtService jwtService;
 
     @Test
