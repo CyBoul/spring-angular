@@ -17,7 +17,8 @@ Non-exhaustive list of upcoming technical and functional improvements:
 
 ### Recent Changes
 
-- Unit and integration tests for AuthController
+- web-layer integration tests for PetController
+- web-layer integration tests for AuthController
 - Unit and integration tests for JwtService
 - Password hashing using BCrypt
 - HTTP interceptor to inject JWT into frontend API calls
