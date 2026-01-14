@@ -9,17 +9,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
+import org.springframework.test.web.servlet.ResultActions;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,28 +56,16 @@ public class AuthControllerWebMvcTest {
     void login_shouldReturnToken_whenCredentialsAreValid() throws Exception {
 
         UserDetails user = User.builder()
-                .username("user@mail.com")
+                .username("user@email.com")
                 .password("password")
                 .authorities("USER")
                 .build();
 
-        Authentication auth = new UsernamePasswordAuthenticationToken(
-                "user@mail.com",
-                null,
-                List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        when(authenticationManager.authenticate(any())).thenReturn(mock(Authentication.class));
+        when(userService.loadUserByUsername(user.getUsername())).thenReturn(user);
+        when(jwtService.generateToken(user.getUsername())).thenReturn("TOKEN");
 
-        when(authenticationManager.authenticate(any())).thenReturn(auth);
-        when(userService.loadUserByUsername("user@mail.com")).thenReturn(user);
-        when(jwtService.generateToken(any())).thenReturn("TOKEN");
-
-        mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                        {
-                          "email": "user@mail.com",
-                          "password": "password"
-                        }
-                        """))
+        performLogin(user.getUsername(), user.getPassword())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").isNotEmpty());
 
@@ -95,14 +80,7 @@ public class AuthControllerWebMvcTest {
         when(authenticationManager.authenticate(any()))
                 .thenThrow(BadCredentialsException.class);
 
-        mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                        {
-                          "email": "user@mail.com",
-                          "password": "wrongPassword"
-                        }
-                        """))
+        performLogin("user@mail.com","wrongPassword")
                 .andExpect(status().isUnauthorized());
 
         verify(authenticationManager, times(1)).authenticate(any());
@@ -116,18 +94,24 @@ public class AuthControllerWebMvcTest {
         when(authenticationManager.authenticate(any()))
                 .thenThrow(UsernameNotFoundException.class);
 
-        mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                        {
-                          "email": "unknow@mail.com",
-                          "password": "password"
-                        }
-                        """))
+        performLogin("unknown@mail.com","password")
                 .andExpect(status().isUnauthorized());
 
         verify(authenticationManager, times(1)).authenticate(any());
         verify(userService, never()).loadUserByUsername(any());
         verify(jwtService, never()).generateToken(any());
     }
+
+    private ResultActions performLogin(String email, String password) throws Exception {
+
+        return mockMvc.perform(post("/api/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(String.format("""
+                {
+                  "email": "%s",
+                  "password": "%s"
+                }
+                """, email, password)));
+    }
+
 }
