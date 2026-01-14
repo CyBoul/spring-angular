@@ -1,12 +1,14 @@
 package com.cyboul.demo.web;
 
-import com.cyboul.demo.config.TestSecurityConfig;
+import com.cyboul.demo.config.MvcTestConfig;
 import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.model.pet.Animal;
 import com.cyboul.demo.model.pet.Pet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -24,11 +26,20 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 /*
- * Slice MVC / Partial Integration (without DB, Repo, JPA)
+ * Slice MVC
+ * - Partial Integration Test (without DB, Repo, JPA)
+ * - Test controller behavior only
+ * - Enable minimal WebSecurity (simulate auth = @WithMockUser)
+ *   JwtFilter being a @Component, we must exclude it to not interfere
  */
 
-@WebMvcTest(PetController.class)
-@Import(TestSecurityConfig.class)
+@WebMvcTest(
+        controllers = PetController.class,
+        excludeFilters = @ComponentScan.Filter(
+            type = FilterType.ASSIGNABLE_TYPE,
+            classes = JwtFilter.class
+        ))
+@Import(MvcTestConfig.class)
 public class PetControllerWebMvcTest {
 
     @Autowired
@@ -217,10 +228,15 @@ public class PetControllerWebMvcTest {
     @WithMockUser(username = "user@mail.com", roles = {"USER"})
     void deletePet_shouldReturnsForbidden_whenNotAuthenticatedAsAdmin() throws Exception {
 
+        when(petRepository.existsById(1L)).thenReturn(true);
+
         mockMvc.perform(delete("/api/pets/1")
                         .contentType(MediaType.APPLICATION_JSON))
 
                 .andExpect(status().isForbidden());
+
+        verify(petRepository, never()).existsById(1L);
+        verify(petRepository, never()).deleteById(any());
     }
 
     // 401 Unauthorized
