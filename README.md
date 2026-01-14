@@ -24,7 +24,7 @@ The focus is not on delivering a finished product, but on:
 ### Engineering Focus
 
 #### Testing
-- Unit and integration tests
+- Unit, web (MVC slice) & integration tests
 - Tests used as a safety net for refactoring
 - Ongoing work toward more consistent, behavior-focused tests
 - Gradual introduction of TDD for upcoming features
@@ -34,7 +34,9 @@ The focus is not on delivering a finished product, but on:
 - Preference for simple, readable design over premature abstraction
 - SOLID principles used as guidelines, not strict rules
 
-> Progress and technical notes: [Change log](notes/progress.md)
+> Progress and technical notes:
+> - [Change log](notes/progress.md)
+> - [Testing strategy](notes/tests.md)
 
 ---
 
