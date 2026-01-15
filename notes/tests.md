@@ -1,4 +1,6 @@
-[<< Readme](../README.md)
+<< [Readme](../README.md)
+
+---
 
 ### Testing strategy
 
@@ -11,6 +13,8 @@ Each test type has a clearly defined scope and responsibility.
 - No duplicated coverage across layers
 - MVC slice tests *do not* replace integration tests
 - Integration tests *do not* replace E2E tests
+
+> See [Security-focused int tests](securitytests.md)
 
 ---
 
@@ -59,7 +63,7 @@ Examples:
 
 - Partial Spring context
 - Real beans and configuration
-- No HTTP layer (unless explicitly needed)
+- No HTTP layer by default (MockMvc allowed when required)
 - No full infrastructure bootstrapping unless required
 
 **Examples**:
@@ -67,6 +71,8 @@ Examples:
 - Service + configuration integration
 - Security or JWT configuration
 - Cross-bean interactions
+
+> See [Security-focused integration tests (JWT, roles, filters)](securitytests.md)
 
 ---
 

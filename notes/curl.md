@@ -1,4 +1,6 @@
-[<< Readme](../README.md) | [<< Change logs](progress.md)
+<< [Readme](../README.md) | [Change logs](progress.md)
+
+---
 
 #### Auth Error
 

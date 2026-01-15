@@ -36,7 +36,7 @@ The focus is not on delivering a finished product, but on:
 
 > Progress and technical notes:
 > - [Change log](notes/progress.md)
-> - [Testing strategy](notes/tests.md)
+> - [Testing strategy & security tests](notes/tests.md)
 
 ---
 
