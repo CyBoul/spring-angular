@@ -14,8 +14,6 @@ Each test type has a clearly defined scope and responsibility.
 - MVC slice tests *do not* replace integration tests
 - Integration tests *do not* replace E2E tests
 
-> See [Security-focused int tests](securitytests.md)
-
 ---
 
 #### Unit tests
