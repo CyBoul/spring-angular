@@ -39,15 +39,15 @@ public class SecurityConfig {
                     .requestMatchers(ANGU_ASSETS).permitAll()
                     .anyRequest().authenticated())
 
-                // Stateless API, so...
+                .csrf(AbstractHttpConfigurer::disable)
+                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(session -> session
                      .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .csrf(AbstractHttpConfigurer::disable)
 
                 // Disabled for dev purpose
                 .cors(AbstractHttpConfigurer::disable)
-                //.cors(cors -> {}) // Declare CorsConfigurationSource (bean) and do nothing with it
 
+                //.cors(cors -> {}) // Declare CorsConfigurationSource (bean) and do nothing with it
                 //.formLogin((form) -> form.loginPage("/login").permitAll())
                 //.logout(LogoutConfigurer::permitAll)
         ;
@@ -68,15 +68,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("dev")
+    @Profile("!dev")
     public CorsConfigurationSource corsConfigurationSource() {
-        // This bean will be used by `http.cors(cors -> {})` in `securityFilterChain()`
+        // This bean will be used in `securityFilterChain()`
 
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        config.setAllowCredentials(false);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);

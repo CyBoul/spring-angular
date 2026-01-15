@@ -1,6 +1,9 @@
 package com.cyboul.demo.config;
 
 
+import com.cyboul.demo.logic.service.JwtService;
+import com.cyboul.demo.web.JwtFilter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -17,23 +20,24 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @TestConfiguration
 @EnableWebSecurity
-public class TestSecurityConfig {
+public class SecurityTestConfig {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
 
-                //.cors(AbstractHttpConfigurer::disable);
+                .cors(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-                //http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -47,6 +51,13 @@ public class TestSecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    @Bean
+    public JwtFilter jwtFilter(UserDetailsService userService, JwtService jwtService) {
+        return new JwtFilter(userService, jwtService);
+    }
+
+    // Diff from Prod - Simulated UserService
 
     @Bean
     @Primary // Prior to UserService for tests purpose
