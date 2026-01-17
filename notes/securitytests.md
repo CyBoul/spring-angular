@@ -1,4 +1,4 @@
-<< [Readme](../README.md) |  [Change log](progress.md) | [Testing strategy](tests.md)
+<< [Readme](../README.md) |  [Testing strategy](tests.md)
 
 ---
 

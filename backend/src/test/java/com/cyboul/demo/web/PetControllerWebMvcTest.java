@@ -1,14 +1,15 @@
 package com.cyboul.demo.web;
 
-import com.cyboul.demo.config.MvcTestConfig;
+import com.cyboul.demo.config.SecurityConfig;
+import com.cyboul.demo.config.TestUsersConfig;
 import com.cyboul.demo.logic.data.PetRepository;
+import com.cyboul.demo.logic.service.JwtService;
 import com.cyboul.demo.model.pet.Animal;
 import com.cyboul.demo.model.pet.Pet;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,16 +31,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - Partial Integration Test (without DB, Repo, JPA)
  * - Test controller behavior only
  * - Enable minimal WebSecurity (simulate auth = @WithMockUser)
- *   JwtFilter being a @Component, we must exclude it to not interfere
+ * - Simulate users
  */
 
-@WebMvcTest(
-        controllers = PetController.class,
-        excludeFilters = @ComponentScan.Filter(
-            type = FilterType.ASSIGNABLE_TYPE,
-            classes = JwtFilter.class
-        ))
-@Import(MvcTestConfig.class)
+@WebMvcTest(PetController.class)
+@Import({ SecurityConfig.class, TestUsersConfig.class })
+@AutoConfigureMockMvc()
 public class PetControllerWebMvcTest {
 
     @Autowired
@@ -47,6 +44,9 @@ public class PetControllerWebMvcTest {
 
     @MockitoBean
     PetRepository petRepository;
+
+    @MockitoBean
+    JwtService jwtService;
 
     @Test
     @WithMockUser(username = "user@mail.com", roles = {"USER"})

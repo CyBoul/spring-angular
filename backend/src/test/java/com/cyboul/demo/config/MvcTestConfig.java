@@ -14,8 +14,8 @@ public class MvcTestConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authorizeHttpRequests(auth -> auth
+
+        http.authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/pets/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()

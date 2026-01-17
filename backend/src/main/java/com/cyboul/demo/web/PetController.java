@@ -2,10 +2,10 @@ package com.cyboul.demo.web;
 
 import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.model.pet.Pet;
-import com.cyboul.demo.web.hateoas.PetModelAssembler;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -27,8 +27,8 @@ public class PetController {
         return new ResponseEntity<>(pets, HttpStatus.OK);
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
+    @ResponseStatus(HttpStatus.CREATED)
     public void create(@Valid @RequestBody Pet pet){
         repository.save(pet);
     }
@@ -40,8 +40,8 @@ public class PetController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Long id, @Valid @RequestBody Pet pet){
         repository.findById(id)
                 .map(existing -> {
@@ -51,8 +51,9 @@ public class PetController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id){
         if(!repository.existsById(id)){
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);

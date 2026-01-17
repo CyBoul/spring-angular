@@ -27,7 +27,7 @@ Each test type has a clearly defined scope and responsibility.
 - Dependencies mocked manually
 - Fast and deterministic
 
-Examples:
+**Examples**:
 - Domain services
 - Utility classes 
 - Pure business rules
@@ -65,7 +65,6 @@ Examples:
 - No full infrastructure bootstrapping unless required
 
 **Examples**:
-
 - Service + configuration integration
 - Security or JWT configuration
 - Cross-bean interactions

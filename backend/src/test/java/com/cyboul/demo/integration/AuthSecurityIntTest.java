@@ -1,7 +1,8 @@
 package com.cyboul.demo.integration;
 
 import com.cyboul.demo.config.JwtTestConfig;
-import com.cyboul.demo.config.SecurityTestConfig;
+import com.cyboul.demo.config.NoDatabaseConfig;
+import com.cyboul.demo.config.TestUsersConfig;
 import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.logic.service.JwtService;
 import org.junit.jupiter.api.Test;
@@ -11,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -32,12 +34,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - Purpose: validate HTTP security behavior (status codes, role access, JWT auth)
  * - Context: near-real Spring Boot context with MockMvc
  * - Scope: no service/business logic verification
- * - Repo/DB interactions are mocked as needed for controller flow
+ * - Needed for controller flow :
+ *   - Repository mocked
+ *   - Autoconfig DB/JPA excluded
+ *   - UserService simulated
  */
 
-@SpringBootTest
+@SpringBootTest()
 @AutoConfigureMockMvc
-@Import({JwtTestConfig.class, SecurityTestConfig.class})
+@Import({ NoDatabaseConfig.class, JwtTestConfig.class, TestUsersConfig.class })
 @ActiveProfiles("test")
 public class AuthSecurityIntTest {
 
@@ -46,6 +51,9 @@ public class AuthSecurityIntTest {
 
     @Autowired
     JwtService jwtService;
+
+    @Autowired
+    UserDetailsService userService;
 
     @MockitoBean
     PetRepository petRepository;
@@ -102,6 +110,7 @@ public class AuthSecurityIntTest {
     @Test
     void deletePetById_shouldReturn403_withUserToken() throws Exception {
 
+        //when(petRepository.existsById(1L)).thenReturn(true);
         performDeletePetWithToken(jwtService.generateToken("user@mail.com"))
                 .andExpect(status().isForbidden());
     }

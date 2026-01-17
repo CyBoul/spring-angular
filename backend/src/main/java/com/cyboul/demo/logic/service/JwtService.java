@@ -48,13 +48,15 @@ public class JwtService {
 
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
-        return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
+        return username != null && userDetails != null && userDetails.getUsername() != null
+                && username.equals(userDetails.getUsername())
+                && !isTokenExpired(token);
     }
 
     public String extractUsername(String token) {
         return Optional.ofNullable(extractClaims(token))
                 .map(Claims::getSubject)
-                .orElse("");
+                .orElse(null);
     }
 
     private Claims extractClaims(String token){

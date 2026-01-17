@@ -2,11 +2,13 @@ package com.cyboul.demo.logic.service;
 
 import com.cyboul.demo.logic.data.UserRepository;
 import com.cyboul.demo.model.user.User;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+@Profile("!test") // temporary solve Bean conflict in test env
 @Service
 public class UserService implements UserDetailsService {
 
