@@ -3,8 +3,9 @@ package com.cyboul.demo.integration;
 import com.cyboul.demo.config.JwtTestConfig;
 import com.cyboul.demo.config.NoDatabaseConfig;
 import com.cyboul.demo.config.TestUsersConfig;
-import com.cyboul.demo.logic.data.PetRepository;
+import com.cyboul.demo.logic.service.AdoptionService;
 import com.cyboul.demo.logic.service.JwtService;
+import com.cyboul.demo.logic.service.PetService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * - Context: near-real Spring Boot context with MockMvc
  * - Scope: no service/business logic verification
  * - Needed for controller flow :
- *   - Repository mocked
+ *   - PetService mocked
  *   - Autoconfig DB/JPA excluded
  *   - UserService simulated
  */
@@ -56,7 +57,10 @@ public class AuthSecurityIntTest {
     UserDetailsService userService;
 
     @MockitoBean
-    PetRepository petRepository;
+    PetService petService;
+
+    @MockitoBean
+    AdoptionService adoptionService;
 
     @Test
     void login_shouldReturnToken_whenCredentialsAreValid() throws Exception {
@@ -77,7 +81,7 @@ public class AuthSecurityIntTest {
     @Test
     void getPets_shouldReturn200_whenJwtIsValid() throws Exception {
 
-        when(petRepository.findAll()).thenReturn(new ArrayList<>());
+        when(petService.findAll()).thenReturn(new ArrayList<>());
 
         performGetPetsWithToken(jwtService.generateToken("user@mail.com"))
                 .andExpect(status().isOk());
@@ -100,8 +104,7 @@ public class AuthSecurityIntTest {
     @Test
     void deletePetById_shouldReturn204_withAdminToken() throws Exception {
 
-        when(petRepository.existsById(1L)).thenReturn(true);
-        doNothing().when(petRepository).deleteById(1L);
+        doNothing().when(petService).delete(1L);
 
         performDeletePetWithToken(jwtService.generateToken("admin@mail.com"))
                 .andExpect(status().isNoContent());
@@ -110,13 +113,12 @@ public class AuthSecurityIntTest {
     @Test
     void deletePetById_shouldReturn403_withUserToken() throws Exception {
 
-        //when(petRepository.existsById(1L)).thenReturn(true);
         performDeletePetWithToken(jwtService.generateToken("user@mail.com"))
                 .andExpect(status().isForbidden());
     }
 
     private ResultActions performAuthenticatedRequest(
-            MockHttpServletRequestBuilder builder, String token ) throws Exception {
+            MockHttpServletRequestBuilder builder, String token) throws Exception {
 
         return mockMvc.perform(builder
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + token));
@@ -129,5 +131,4 @@ public class AuthSecurityIntTest {
     private ResultActions performGetPetsWithToken(String token) throws Exception {
         return performAuthenticatedRequest(get("/api/pets"), token);
     }
-
 }
