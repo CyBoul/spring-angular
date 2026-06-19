@@ -1,18 +1,13 @@
 package com.cyboul.demo.web.hateoas;
 
-import com.cyboul.demo.logic.data.PetRepository;
+import com.cyboul.demo.logic.service.PetService;
 import com.cyboul.demo.model.pet.Pet;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /*
  * This controller is a small HATEOAS example kept intentionally
@@ -26,57 +21,40 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RequestMapping("/api/hateoas/pets")
 public class PetHateoasController {
 
-    private final PetRepository repository;
+    private final PetService petService;
     private final PetModelAssembler assembler;
 
-    public PetHateoasController(PetRepository repo, PetModelAssembler assembler){
-        this.repository = repo;
+    public PetHateoasController(PetService petService, PetModelAssembler assembler) {
+        this.petService = petService;
         this.assembler = assembler;
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Pet>> viewAll(){
-        List<Pet> pets = repository.findAll()
-                .stream()
-                .map(assembler::toModel)
-                .toList();
-
-        return new ResponseEntity<>(pets, HttpStatus.OK);
+    public List<Pet> viewAll() {
+        return petService.findAll().stream().map(assembler::toModel).toList();
     }
 
-    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("")
-    public void create(@Valid @RequestBody Pet pet){
-        repository.save(pet);
+    @ResponseStatus(HttpStatus.CREATED)
+    public Pet create(@Valid @RequestBody Pet pet) {
+        return petService.create(pet);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Pet> viewOne(@PathVariable Long id){
-        return repository.findById(id)
-                .map(assembler::toModel)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public Pet viewOne(@PathVariable Long id) {
+        return assembler.toModel(petService.findById(id));
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{id}")
-    public void update(@PathVariable Long id, @Valid @RequestBody Pet pet){
-        repository.findById(id)
-                .map(existing -> {
-                    pet.setId(existing.getId());
-                    return repository.save(pet);
-                })
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-    }
-
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
-        if(!repository.existsById(id)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-        repository.deleteById(id);
+    public void update(@PathVariable Long id, @Valid @RequestBody Pet pet) {
+        petService.update(id, pet);
     }
 
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void delete(@PathVariable Long id) {
+        petService.delete(id);
+    }
 }

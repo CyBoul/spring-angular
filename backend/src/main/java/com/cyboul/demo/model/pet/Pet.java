@@ -2,6 +2,8 @@ package com.cyboul.demo.model.pet;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.hateoas.RepresentationModel;
@@ -13,7 +15,12 @@ public class Pet extends RepresentationModel<Pet> {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @NotBlank
+    @Size(max = 50)
     private String name;
+
+    @Size(max = 300)
     private String description;
 
     @Enumerated(EnumType.STRING)
