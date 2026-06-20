@@ -25,6 +25,7 @@ public class PetController {
     }
 
     @PostMapping("")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public Pet create(@Valid @RequestBody Pet pet) {
         return petService.create(pet);
@@ -36,6 +37,7 @@ public class PetController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@PathVariable Long id, @Valid @RequestBody Pet pet) {
         petService.update(id, pet);

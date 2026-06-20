@@ -105,8 +105,8 @@ public class PetControllerWebMvcTest {
     }
 
     @Test
-    @WithMockUser(username = "user@mail.com", roles = {"USER"})
-    void createPet_shouldReturnCreated_whenAuthenticated() throws Exception {
+    @WithMockUser(username = "admin@mail.com", roles = {"ADMIN"})
+    void createPet_shouldReturnCreated_whenAuthenticatedAsAdmin() throws Exception {
 
         String name = "Milo";
         String desc = "";
@@ -134,8 +134,8 @@ public class PetControllerWebMvcTest {
     }
 
     @Test
-    @WithMockUser(username = "user@mail.com", roles = {"USER"})
-    void updatePet_shouldReturnsNoContent_whenAuthenticatedAndPetExists() throws Exception {
+    @WithMockUser(username = "admin@mail.com", roles = {"ADMIN"})
+    void updatePet_shouldReturnsNoContent_whenAuthenticatedAsAdminAndPetExists() throws Exception {
 
         String name = "Milo";
         String desc = "";
@@ -159,8 +159,8 @@ public class PetControllerWebMvcTest {
     }
 
     @Test
-    @WithMockUser(username = "user@mail.com", roles = {"USER"})
-    void updatePet_shouldReturnsNotFound_whenAuthenticatedAndPetDoesNotExist() throws Exception {
+    @WithMockUser(username = "admin@mail.com", roles = {"ADMIN"})
+    void updatePet_shouldReturnsNotFound_whenAuthenticatedAsAdminAndPetDoesNotExist() throws Exception {
 
         String name = "Milo";
         String desc = "";
@@ -212,6 +212,36 @@ public class PetControllerWebMvcTest {
     }
 
     // 403 Forbidden
+
+    @Test
+    @WithMockUser(username = "user@mail.com", roles = {"USER"})
+    void createPet_shouldReturnForbidden_whenAuthenticatedAsUser() throws Exception {
+
+        mockMvc.perform(post("/api/pets")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"name":"Hacked","type":"DOG"}
+                            """))
+
+                .andExpect(status().isForbidden());
+
+        verify(petService, never()).create(any());
+    }
+
+    @Test
+    @WithMockUser(username = "user@mail.com", roles = {"USER"})
+    void updatePet_shouldReturnForbidden_whenAuthenticatedAsUser() throws Exception {
+
+        mockMvc.perform(put("/api/pets/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                            {"name":"Hacked","type":"DOG"}
+                            """))
+
+                .andExpect(status().isForbidden());
+
+        verify(petService, never()).update(any(), any());
+    }
 
     @Test
     @WithMockUser(username = "user@mail.com", roles = {"USER"})

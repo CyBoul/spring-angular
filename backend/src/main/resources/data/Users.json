@@ -10,7 +10,7 @@
       "username": "admin",
       "password": "admin",
       "email": "admin@fake.com",
-      "role": "ROLE_GOD"
+      "role": "ROLE_ADMIN"
     },
     {
       "username": "Bob",

@@ -13,7 +13,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -47,12 +46,20 @@ public class AuthController {
                             request.email(), request.password()));
         } catch (BadCredentialsException e){
             log.error("Login attempt failed for '{}'", request.email());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body(Collections.singletonMap("error", "Invalid credentials"));
+            Map<String, String> err = new HashMap<>();
+            err.put("error", "Invalid credentials");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(err);
         }
         UserDetails userDetails = userService.loadUserByUsername(request.email());
         String jwt = jwtService.generateToken(userDetails.getUsername());
-        return ResponseEntity.ok(Collections.singletonMap("token", jwt));
+        String role = userDetails.getAuthorities().stream()
+                .findFirst()
+                .map(a -> a.getAuthority())
+                .orElse("ROLE_USER");
+        Map<String, String> body = new HashMap<>();
+        body.put("token", jwt);
+        body.put("role", role);
+        return ResponseEntity.ok(body);
     }
 
     @GetMapping("/gugu")
