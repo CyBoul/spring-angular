@@ -1,23 +1,20 @@
-import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
-import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi, HttpClient } from '@angular/common/http';
+import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChangeDetection } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideHttpClient, HTTP_INTERCEPTORS, withInterceptorsFromDi } from '@angular/common/http';
 import { provideRouter } from '@angular/router';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeng/themes/aura';
 import { JwtInterceptor } from './filters/jwt.interceptor';
 import { routes } from './app.routes';
-import { AuthService } from './services/auth.service';
-import { firstValueFrom } from 'rxjs';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
+    provideAnimationsAsync(),
     provideHttpClient(withInterceptorsFromDi()),
-    { provide: HTTP_INTERCEPTORS, useClass:JwtInterceptor, multi:true },
-
-    // ToRmv // Tests purposes
-    provideAppInitializer(async () => {
-      const authService = inject(AuthService);
-      return await firstValueFrom(authService.initAppAuth());
-    }),
+    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
+    providePrimeNG({ theme: { preset: Aura } }),
   ]
 };

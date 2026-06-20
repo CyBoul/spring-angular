@@ -1,63 +1,40 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, map, Observable, of, tap } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = '/api/auth';
-  private token: string | null = null;
+  private readonly TOKEN_KEY = 'jwt_token';
+  private readonly ROLE_KEY = 'jwt_role';
 
   constructor(private http: HttpClient) {}
 
-  initAppAuth(): Observable<void> {  // ToRmv  // just for testing purposes
+  login(email: string, password: string): Observable<{ token: string; role: string }> {
     return this.http
-      .post<{ token: string }>(
-        '/api/auth/login', 
-        {
-          email: 'frontend-app',
-          password: 'frontend-secret'
-        }
-      )
+      .post<{ token: string; role: string }>('/api/auth/login', { email, password })
       .pipe(
-        tap(({ token }) => {
-          this.token = token;
-          //this.saveToken(token) // optional, for persistence 
-        }),
-        map(() => void 0), // convert to Observable<void>
-        catchError(err => {
-          console.error('Auto-login failed', err);
-          return of(void 0); // app still starts even if login fails
+        tap(({ token, role }) => {
+          localStorage.setItem(this.TOKEN_KEY, token);
+          localStorage.setItem(this.ROLE_KEY, role);
         })
       );
   }
 
-  login(email: string, password: string): Observable<any> {
-    return this.http
-        .post<{ token: string }>(`${this.apiUrl}/login`, { email, password })
-          .pipe(
-            tap(({ token }) => {
-              this.token = token;
-            }),
-            map(() => void 0), // convert to Observable<void>
-            catchError(err => {
-              console.error('Auto-login failed', err);
-              return of(void 0); // app still starts even if login fails
-            })
-          );
+  logout(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.ROLE_KEY);
   }
 
-  //saveToken(token: string) { localStorage.setItem('jwt', token); }
-
-  getToken() {
-    return this.token;
-    //|| localStorage.getItem('jwt'); // ToRmv
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  logout() {
-    this.token = null;
-    localStorage.removeItem('jwt'); // ToRmv
+  isLoggedIn(): boolean {
+    return !!this.getToken();
+  }
+
+  isAdmin(): boolean {
+    return localStorage.getItem(this.ROLE_KEY) === 'ROLE_ADMIN';
   }
 }
