@@ -1,7 +1,8 @@
 package com.cyboul.demo.web;
 
 import com.cyboul.demo.logic.service.PetService;
-import com.cyboul.demo.model.pet.Pet;
+import com.cyboul.demo.dto.PetDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pets")
+@SecurityRequirement(name = "bearer")
 public class PetController {
 
     private final PetService petService;
@@ -20,27 +22,27 @@ public class PetController {
     }
 
     @GetMapping("")
-    public List<Pet> viewAll() {
+    public List<PetDTO> viewAll() {
         return petService.findAll();
     }
 
     @PostMapping("")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
-    public Pet create(@Valid @RequestBody Pet pet) {
-        return petService.create(pet);
+    public PetDTO create(@Valid @RequestBody PetDTO dto) {
+        return petService.create(dto);
     }
 
     @GetMapping("/{id}")
-    public Pet viewOne(@PathVariable Long id) {
+    public PetDTO viewOne(@PathVariable Long id) {
         return petService.findById(id);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void update(@PathVariable Long id, @Valid @RequestBody Pet pet) {
-        petService.update(id, pet);
+    public void update(@PathVariable Long id, @Valid @RequestBody PetDTO dto) {
+        petService.update(id, dto);
     }
 
     @DeleteMapping("/{id}")

@@ -1,8 +1,8 @@
 package com.cyboul.demo.web;
 
 import com.cyboul.demo.logic.service.AdoptionService;
-import com.cyboul.demo.model.Adoption;
-import com.cyboul.demo.model.AdoptionRequest;
+import com.cyboul.demo.dto.AdoptionDTO;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/adoptions")
+@SecurityRequirement(name = "bearer")
 public class AdoptionController {
 
     private final AdoptionService adoptionService;
@@ -22,12 +23,12 @@ public class AdoptionController {
 
     @PostMapping("")
     @ResponseStatus(HttpStatus.CREATED)
-    public Adoption adopt(@Valid @RequestBody AdoptionRequest request, Authentication auth) {
-        return adoptionService.adopt(request.petId(), auth.getName());
+    public AdoptionDTO adopt(@Valid @RequestBody AdoptionDTO dto, Authentication auth) {
+        return adoptionService.adopt(dto.petId(), auth.getName());
     }
 
     @GetMapping("/my")
-    public List<Adoption> myAdoptions(Authentication auth) {
+    public List<AdoptionDTO> myAdoptions(Authentication auth) {
         return adoptionService.findByUserEmail(auth.getName());
     }
 }
