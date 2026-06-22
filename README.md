@@ -1,61 +1,76 @@
-## Engineering Sandbox
+# Pet Adoption — Full-Stack Demo
 
-### Purpose
+![Java](https://img.shields.io/badge/Java-21_LTS-orange?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.5-6DB33F?logo=springboot&logoColor=white)
+![Angular](https://img.shields.io/badge/Angular-20-DD0031?logo=angular&logoColor=white)
+![PrimeNG](https://img.shields.io/badge/PrimeNG-20-1976D2?logo=primeng&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-4169E1?logo=postgresql&logoColor=white)
+![Maven](https://img.shields.io/badge/Maven-3-C71A36?logo=apachemaven&logoColor=white)
 
-This repository is a small, evolving project used to practice **testing, refactoring, and code structure** in a realistic full-stack environment.
-
-The focus is not on delivering a finished product, but on:
-- improving testability,
-- applying SOLID principles pragmatically,
-- learning through iteration and refactoring,
-- documenting technical decisions and trade-offs.
-
----
-
-### Tech Stack
-
-- Java 24 / Spring Boot 3
-- PostgreSQL / Docker
-- Angular 20 / Node.js 24
-- Maven multi-module build
+A **pet adoption platform** — browse pets, adopt one, manage the catalog as an admin.
 
 ---
 
-### Engineering Focus
+## Tech Stack
 
-#### Testing
-- Unit, web (MVC slice) & integration tests
-- Tests used as a safety net for refactoring
-- Ongoing work toward more consistent, behavior-focused tests
-- Gradual introduction of TDD for upcoming features
-
-#### Code Structure
-- Effort to keep business logic independent from technical concerns
-- Preference for simple, readable design over premature abstraction
-- SOLID principles used as guidelines, not strict rules
-
-> Progress and technical notes:
-> - [Change log](notes/progress.md)
-> - [Testing strategy & security tests](notes/tests.md)
+| Layer | Technology |
+|-------|-----------|
+| Backend | Java 21 · Spring Boot 3.5.5 · Spring Security (JWT) · Spring Data JPA |
+| Database | PostgreSQL · Docker Compose |
+| API | REST · RFC 7807 ProblemDetail · OpenAPI / Swagger UI |
+| Frontend | Angular 20 · PrimeNG 20 · Standalone components |
+| Build | Maven multi-module |
 
 ---
 
-### Build
+## Running Locally
+
+**Requirements:** Docker, Java 21+, Node 22+
+
 ```bash
-mvn install
+# Start PostgreSQL
+docker compose up -d
+
+# Backend (port 8080)
+./mvnw spring-boot:run -pl backend -DskipTests
+
+# Frontend dev server (port 4200, proxies /api to backend)
+cd frontend && npx ng serve --proxy-config proxy.conf.json
 ```
-This command builds both frontend and backend and packages them together.
+
+Open [http://localhost:4200](http://localhost:4200)
+
+**Default users:**
+
+| Email | Password | Role |
+|-------|----------|------|
+| `admin@fake.com` | `admin` | ADMIN |
+| `bob@fake.com` | `password` | USER |
+
+API docs: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 ---
 
-### What I would refactor next
+## Tests
 
-If the project grows, the next steps would likely include:
+```bash
+cd backend && mvn test
+```
 
-- improving test consistency and readability,
-- introducing stricter boundaries where complexity increases,
-- refactoring incrementally while avoiding unnecessary abstraction.
+32 tests across unit, Web MVC slice, and integration layers.
 
-These changes are intentionally deferred to keep the project simple and focused.
+| Suite | Type | What it covers |
+|-------|------|----------------|
+| `JwtServiceUnitTest` | Unit | Token generation, parsing, expiry |
+| `PetControllerWebMvcTest` | MVC slice | Authorization rules (200/201/204/401/403/404) |
+| `AuthControllerWebMvcTest` | MVC slice | Login happy path, bad credentials |
+| `AuthSecurityIntTest` | Integration | Full security chain — filter, token validation, role enforcement |
+| `JwtServiceIntTest` | Integration | JWT round-trip with real Spring context |
 
+---
 
+## Project Notes
+
+- [Improvement roadmap](notes/plan.md)
+- [Testing strategy](notes/tests.md)
+- [Progress log](notes/progress.md)

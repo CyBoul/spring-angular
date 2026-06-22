@@ -9,14 +9,20 @@ Non-exhaustive list of upcoming technical and functional improvements:
 
 - CORS configuration and security hardening
 - Token lifetime and refresh strategy
-- UI integration (Bootstrap / PrimeNG)
-- Login page implementation
-- Role-based access control
+- Testcontainers for integration tests
+- CI pipeline (GitHub Actions)
 
 ---
 
 ### Recent Changes
 
+- DTO layer (`PetDTO`, `AdoptionDTO`, `AuthDTO`) — JPA entities no longer exposed through REST API
+- Swagger UI public access with JWT Bearer auth scheme (`@SecurityScheme` / `@SecurityRequirement`)
+- Logback config — quiets Hikari, Hibernate, Tomcat at startup; app package at DEBUG
+- SPA deep-link support — Spring Security permits Angular routes, MvcConfig catch-all forwards to index.html
+- PrimeNG downgraded from 20.5.1-lts to 20.4.0 (non-LTS) — removes license banner
+- Login page, pet list, admin CRUD with PrimeNG 20
+- Routing with `authGuard` / `adminGuard`, lazy-loaded routes
 - web-layer integration tests for PetController
 - web-layer integration tests for AuthController
 - Unit and integration tests for JwtService
