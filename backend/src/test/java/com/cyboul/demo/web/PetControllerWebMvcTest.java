@@ -6,7 +6,7 @@ import com.cyboul.demo.exception.PetNotFoundException;
 import com.cyboul.demo.logic.service.JwtService;
 import com.cyboul.demo.logic.service.PetService;
 import com.cyboul.demo.model.pet.Animal;
-import com.cyboul.demo.model.pet.Pet;
+import com.cyboul.demo.dto.PetDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -17,7 +17,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -53,9 +52,9 @@ public class PetControllerWebMvcTest {
     @WithMockUser(username = "user@mail.com", roles = {"USER"})
     void viewAllPets_shouldReturnOk_whenAuthenticated() throws Exception {
 
-        List<Pet> pets = new ArrayList<>();
-        pets.add(new Pet(1L, "Milo", "", Animal.DOG));
-        pets.add(new Pet(2L, "Salem", "", Animal.CAT));
+        List<PetDTO> pets = List.of(
+                new PetDTO(1L, "Milo", "", Animal.DOG),
+                new PetDTO(2L, "Salem", "", Animal.CAT));
 
         when(petService.findAll()).thenReturn(pets);
 
@@ -76,7 +75,7 @@ public class PetControllerWebMvcTest {
     @WithMockUser(username = "user@mail.com", roles = {"USER"})
     void viewOnePetById_shouldReturnsOk_whenAuthenticatedAndPetExists() throws Exception {
 
-        Pet pet = new Pet(1L, "Milo", "", Animal.DOG);
+        PetDTO pet = new PetDTO(1L, "Milo", "", Animal.DOG);
 
         when(petService.findById(1L)).thenReturn(pet);
 
@@ -112,11 +111,7 @@ public class PetControllerWebMvcTest {
         String desc = "";
         Animal type = Animal.DOG;
 
-        Pet pet = new Pet();
-        pet.setName(name);
-        pet.setType(type);
-
-        when(petService.create(any(Pet.class))).thenReturn(pet);
+        when(petService.create(any(PetDTO.class))).thenReturn(new PetDTO(1L, name, desc, type));
 
         mockMvc.perform(post("/api/pets")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -130,7 +125,7 @@ public class PetControllerWebMvcTest {
 
                 .andExpect(status().isCreated());
 
-        verify(petService, times(1)).create(any(Pet.class));
+        verify(petService, times(1)).create(any(PetDTO.class));
     }
 
     @Test
@@ -141,7 +136,7 @@ public class PetControllerWebMvcTest {
         String desc = "";
         Animal type = Animal.DOG;
 
-        doNothing().when(petService).update(eq(1L), any(Pet.class));
+        doNothing().when(petService).update(eq(1L), any(PetDTO.class));
 
         mockMvc.perform(put("/api/pets/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -155,7 +150,7 @@ public class PetControllerWebMvcTest {
 
                 .andExpect(status().isNoContent());
 
-        verify(petService, times(1)).update(eq(1L), any(Pet.class));
+        verify(petService, times(1)).update(eq(1L), any(PetDTO.class));
     }
 
     @Test
@@ -166,7 +161,7 @@ public class PetControllerWebMvcTest {
         String desc = "";
         Animal type = Animal.DOG;
 
-        doThrow(new PetNotFoundException(1L)).when(petService).update(eq(1L), any(Pet.class));
+        doThrow(new PetNotFoundException(1L)).when(petService).update(eq(1L), any(PetDTO.class));
 
         mockMvc.perform(put("/api/pets/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -180,7 +175,7 @@ public class PetControllerWebMvcTest {
 
                 .andExpect(status().isNotFound());
 
-        verify(petService, times(1)).update(eq(1L), any(Pet.class));
+        verify(petService, times(1)).update(eq(1L), any(PetDTO.class));
     }
 
     @Test

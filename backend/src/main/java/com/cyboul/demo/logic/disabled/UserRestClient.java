@@ -1,6 +1,6 @@
 package com.cyboul.demo.logic.disabled;
 
-import com.cyboul.demo.model.externals.UserAPI;
+import com.cyboul.demo.dto.externals.UserAPI;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
 

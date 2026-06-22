@@ -1,6 +1,6 @@
 package com.cyboul.demo.web;
 
-import com.cyboul.demo.model.AuthRequest;
+import com.cyboul.demo.dto.AuthDTO;
 import com.cyboul.demo.logic.service.JwtService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @PostMapping("/auth/login")
-    public ResponseEntity<Map<String,String>> login(@RequestBody @Valid AuthRequest request){
+    public ResponseEntity<Map<String,String>> login(@RequestBody @Valid AuthDTO request){
         log.info("Login attempt '{}'", request.email()); // toRmv
         try {
             authManager.authenticate(

@@ -3,6 +3,7 @@ package com.cyboul.demo.logic.service;
 import com.cyboul.demo.logic.data.AdoptionRepository;
 import com.cyboul.demo.logic.data.UserRepository;
 import com.cyboul.demo.model.Adoption;
+import com.cyboul.demo.dto.AdoptionDTO;
 import com.cyboul.demo.model.user.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -23,16 +24,17 @@ public class AdoptionService {
         this.userRepository = userRepository;
     }
 
-    public Adoption adopt(Long petId, String userEmail) {
-        petService.findById(petId); // validates pet exists — throws PetNotFoundException if not
+    public AdoptionDTO adopt(Long petId, String userEmail) {
+        petService.findById(petId);
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userEmail));
-        return adoptionRepository.save(new Adoption(null, petId, user.getId(), LocalDateTime.now()));
+        Adoption saved = adoptionRepository.save(new Adoption(null, petId, user.getId(), LocalDateTime.now()));
+        return AdoptionDTO.from(saved);
     }
 
-    public List<Adoption> findByUserEmail(String userEmail) {
+    public List<AdoptionDTO> findByUserEmail(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userEmail));
-        return adoptionRepository.findByUserId(user.getId());
+        return adoptionRepository.findByUserId(user.getId()).stream().map(AdoptionDTO::from).toList();
     }
 }

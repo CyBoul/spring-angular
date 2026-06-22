@@ -3,6 +3,7 @@ package com.cyboul.demo.logic.service;
 import com.cyboul.demo.exception.PetNotFoundException;
 import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.model.pet.Pet;
+import com.cyboul.demo.dto.PetDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,25 +17,25 @@ public class PetService {
         this.repository = repository;
     }
 
-    public List<Pet> findAll() {
-        return repository.findAll();
+    public List<PetDTO> findAll() {
+        return repository.findAll().stream().map(PetDTO::from).toList();
     }
 
-    public Pet findById(Long id) {
-        return repository.findById(id).orElseThrow(() -> new PetNotFoundException(id));
+    public PetDTO findById(Long id) {
+        return PetDTO.from(getEntity(id));
     }
 
-    public Pet create(Pet pet) {
-        return repository.save(pet);
+    public PetDTO create(PetDTO dto) {
+        Pet pet = new Pet(null, dto.name(), dto.description(), dto.type());
+        return PetDTO.from(repository.save(pet));
     }
 
-    public void update(Long id, Pet pet) {
-        repository.findById(id)
-                .map(existing -> {
-                    pet.setId(existing.getId());
-                    return repository.save(pet);
-                })
-                .orElseThrow(() -> new PetNotFoundException(id));
+    public void update(Long id, PetDTO dto) {
+        Pet existing = getEntity(id);
+        existing.setName(dto.name());
+        existing.setDescription(dto.description());
+        existing.setType(dto.type());
+        repository.save(existing);
     }
 
     public void delete(Long id) {
@@ -42,5 +43,13 @@ public class PetService {
             throw new PetNotFoundException(id);
         }
         repository.deleteById(id);
+    }
+
+    public List<Pet> findAllEntities() {
+        return repository.findAll();
+    }
+
+    public Pet getEntity(Long id) {
+        return repository.findById(id).orElseThrow(() -> new PetNotFoundException(id));
     }
 }

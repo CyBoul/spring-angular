@@ -1,6 +1,6 @@
 package com.cyboul.demo.logic.disabled;
 
-import com.cyboul.demo.model.externals.UserAPI;
+import com.cyboul.demo.dto.externals.UserAPI;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.service.annotation.GetExchange;
 

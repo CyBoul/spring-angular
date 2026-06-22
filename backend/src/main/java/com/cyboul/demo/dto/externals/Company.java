@@ -1,4 +1,4 @@
-package com.cyboul.demo.model.externals;
+package com.cyboul.demo.dto.externals;
 
 public record Company (
         String name,

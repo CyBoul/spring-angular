@@ -1,8 +1,8 @@
-package com.cyboul.demo.model;
+package com.cyboul.demo.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 
-public record AuthRequest(
+public record AuthDTO(
         @NotEmpty String email,
         @NotEmpty String password
-){}
+) {}

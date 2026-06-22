@@ -1,4 +1,4 @@
-package com.cyboul.demo.model.externals;
+package com.cyboul.demo.dto.externals;
 
 /**
  * Retrieving Users from https://jsonplaceholder.typicode.com/users
