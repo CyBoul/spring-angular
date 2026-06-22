@@ -32,12 +32,16 @@ public class SecurityConfig {
 
     private static final String[] DEFAULT_NAV = new String[]{ "/", "/api/auth/**" };
     private static final String[] ANGU_ASSETS = new String[]{ "/index.html", "/*.css", "/*.js" };
+    private static final String[] SPA_ROUTES  = new String[]{ "/login", "/pets", "/admin/**" };
+    private static final String[] API_DOCS    = new String[]{ "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" };
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
         http.authorizeHttpRequests((requests) -> requests
                     .requestMatchers(DEFAULT_NAV).permitAll()
                     .requestMatchers(ANGU_ASSETS).permitAll()
+                    .requestMatchers(SPA_ROUTES).permitAll()
+                    .requestMatchers(API_DOCS).permitAll()
                     .anyRequest().authenticated())
 
                 .csrf(AbstractHttpConfigurer::disable)
