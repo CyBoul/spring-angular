@@ -13,7 +13,7 @@ Repository / database interactions are **mocked**, so we isolate security behavi
 
 | Endpoint               | JWT / Role            | Expected HTTP Status | Notes                              |
 |---|---|---|---|
-| `POST /api/auth/login` | ✅ Valid credentials   | <span style="color:green">200 OK</span> | Login success, returns JWT token |
+| `POST /api/auth/login` | ✅ Valid credentials   | <span style="color:green">200 OK</span> | Login success, returns role + httpOnly JWT cookie |
 | `POST /api/auth/login` | ❌ Invalid password    | <span style="color:red">401 Unauthorized</span> | Bad credentials                  |
 | `POST /api/auth/login` | ❌ Unknown user        | <span style="color:red">401 Unauthorized</span> | User does not exist              |
 | `GET /api/pets`        | ✅ Valid JWT (USER)    | <span style="color:green">200 OK</span> | Access granted                   |

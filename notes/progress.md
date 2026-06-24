@@ -12,6 +12,16 @@ It is intentionally informal and focuses on implementation steps and learning mi
 
 ### Recent Changes
 
+**Code review round 2 — security**
+- JJWT upgraded 0.11.5 → 0.12.6, migrated to current API (`subject()`, `parseSignedClaims()`, `signWith(key)`)
+- `JwtService` simplified: expired tokens short-circuit, no unnecessary `UserDetails` load
+- `@PreAuthorize("hasRole('ADMIN')")` for HATEOAS controller too
+- `Pet` entity no longer extends `RepresentationModel` — HATEOAS uses `EntityModel<Pet>` wrapper
+- `@NotNull` on `PetDTO.type` for proper RFC 7807 validation errors
+- `JsonDataLoader` uses `count()` instead of `findAll().isEmpty()`
+- `User` `@JsonCreator` constructor now accepts `role` parameter
+- Dead code removal
+
 **Security & architecture hardening**
 - CSP header: `Content-Security-Policy` added to `SecurityConfig` (script, style, font, img, connect directives)
 - CORS externalized: origin moved from hardcoded `localhost:4200` to `app.cors.allowed-origins` property, env-var-backed in prod
