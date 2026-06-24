@@ -21,8 +21,9 @@ import org.springframework.test.web.servlet.ResultActions;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import jakarta.servlet.http.Cookie;
 
 /*
  * MVC Slice Test
@@ -67,7 +68,9 @@ public class AuthControllerWebMvcTest {
 
         performLogin(user.getUsername(), user.getPassword())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").isNotEmpty());
+                .andExpect(jsonPath("$.role").isNotEmpty())
+                .andExpect(cookie().exists("jwt_token"))
+                .andExpect(cookie().httpOnly("jwt_token", true));
 
         verify(authenticationManager, times(1)).authenticate(any());
         verify(userService, times(1)).loadUserByUsername(any());

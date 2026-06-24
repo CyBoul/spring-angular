@@ -1,10 +1,10 @@
 package com.cyboul.demo.web;
 
-import com.cyboul.demo.logic.service.UserService;
 import com.cyboul.demo.logic.service.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,14 +15,12 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
-
-/**
- * Filter = Request interceptor
- * Used to authenticate each requests (stateless)
- */
+import java.util.Arrays;
 
 @Component
 public class JwtFilter extends OncePerRequestFilter {
+
+    static final String COOKIE_NAME = "jwt_token";
 
     private final UserDetailsService userService;
     private final JwtService jwtService;
@@ -36,11 +34,9 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        String jwt = resolveToken(request);
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String jwt = header.substring(7);
-
+        if (jwt != null) {
             try {
                 String username = jwtService.extractUsername(jwt);
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
@@ -60,5 +56,26 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         }
         chain.doFilter(request, response);
+    }
+
+    private String resolveToken(HttpServletRequest request) {
+        // 1. httpOnly cookie (primary)
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            var found = Arrays.stream(cookies)
+                    .filter(c -> COOKIE_NAME.equals(c.getName()))
+                    .map(Cookie::getValue)
+                    .filter(v -> !v.isBlank())
+                    .findFirst();
+            if (found.isPresent()) return found.get();
+        }
+
+        // 2. Authorization header (fallback for Swagger / external clients)
+        String header = request.getHeader("Authorization");
+        if (header != null && header.startsWith("Bearer ")) {
+            return header.substring(7);
+        }
+
+        return null;
     }
 }

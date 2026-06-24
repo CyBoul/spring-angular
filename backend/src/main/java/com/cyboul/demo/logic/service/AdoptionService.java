@@ -7,6 +7,7 @@ import com.cyboul.demo.dto.AdoptionDTO;
 import com.cyboul.demo.model.user.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class AdoptionService {
         this.userRepository = userRepository;
     }
 
+    @Transactional
     public AdoptionDTO adopt(Long petId, String userEmail) {
         petService.findById(petId);
         User user = userRepository.findByEmail(userEmail)
@@ -32,6 +34,7 @@ public class AdoptionService {
         return AdoptionDTO.from(saved);
     }
 
+    @Transactional(readOnly = true)
     public List<AdoptionDTO> findByUserEmail(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userEmail));

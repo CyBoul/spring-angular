@@ -25,8 +25,7 @@ import java.util.ArrayList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 /*
@@ -75,7 +74,9 @@ public class AuthSecurityIntTest {
                         """))
 
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token").isNotEmpty());
+                .andExpect(jsonPath("$.role").isNotEmpty())
+                .andExpect(cookie().exists("jwt_token"))
+                .andExpect(cookie().httpOnly("jwt_token", true));
     }
 
     @Test

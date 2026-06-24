@@ -3,10 +3,10 @@ package com.cyboul.demo.config;
 import com.cyboul.demo.logic.service.JwtService;
 import com.cyboul.demo.web.JwtFilter;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,31 +23,51 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity() // => @PreAuthorized
+@EnableMethodSecurity
 public class SecurityConfig {
 
-    private static final String[] DEFAULT_NAV = new String[]{ "/", "/api/auth/**" };
-    private static final String[] ANGU_ASSETS = new String[]{ "/index.html", "/*.css", "/*.js" };
-    private static final String[] SPA_ROUTES  = new String[]{ "/login", "/pets", "/admin/**" };
-    private static final String[] API_DOCS    = new String[]{ "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" };
+    private static final String[] DEFAULT_NAV = { "/", "/api/auth/login", "/api/auth/logout" };
+    private static final String[] ANGU_ASSETS = { "/index.html", "/*.css", "/*.js" };
+    private static final String[] SPA_ROUTES  = { "/login", "/pets", "/admin/**" };
+    private static final String[] API_DOCS    = { "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**" };
+
+    @Value("${app.cors.allowed-origins:}")
+    private String allowedOrigins;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter) throws Exception {
-        http.authorizeHttpRequests((requests) -> requests
-                    .requestMatchers(DEFAULT_NAV).permitAll()
-                    .requestMatchers(ANGU_ASSETS).permitAll()
-                    .requestMatchers(SPA_ROUTES).permitAll()
-                    .requestMatchers(API_DOCS).permitAll()
-                    .anyRequest().authenticated())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtFilter jwtFilter,
+                                                   Environment env) throws Exception {
+
+        boolean swaggerPublic = Arrays.asList(env.getActiveProfiles()).contains("dev");
+
+        http.authorizeHttpRequests(requests -> {
+                    requests.requestMatchers(DEFAULT_NAV).permitAll()
+                            .requestMatchers(ANGU_ASSETS).permitAll()
+                            .requestMatchers(SPA_ROUTES).permitAll();
+
+                    if (swaggerPublic) {
+                        requests.requestMatchers(API_DOCS).permitAll();
+                    }
+
+                    requests.anyRequest().authenticated();
+                })
 
                 .csrf(AbstractHttpConfigurer::disable)
-                //.cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                // disabled for dev purpose
-                .cors(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+                .headers(headers -> headers
+                     .contentSecurityPolicy(csp -> csp
+                          .policyDirectives("default-src 'self'; "
+                               + "script-src 'self'; "
+                               + "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+                               + "font-src 'self' https://fonts.gstatic.com; "
+                               + "img-src 'self' data:; "
+                               + "connect-src 'self'")))
 
                 .sessionManagement(session -> session
                      .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -79,19 +99,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("!dev")
     public CorsConfigurationSource corsConfigurationSource() {
-        // This bean will be used in `securityFilterChain()`
-
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
-        config.setAllowedHeaders(List.of("Authorization","Content-Type"));
-        config.setAllowCredentials(false);
+        if (!allowedOrigins.isBlank()) {
+            config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        }
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }

@@ -5,6 +5,7 @@ import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.model.pet.Pet;
 import com.cyboul.demo.dto.PetDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class PetService {
         return PetDTO.from(repository.save(pet));
     }
 
+    @Transactional
     public void update(Long id, PetDTO dto) {
         Pet existing = getEntity(id);
         existing.setName(dto.name());
@@ -38,6 +40,7 @@ public class PetService {
         repository.save(existing);
     }
 
+    @Transactional
     public void delete(Long id) {
         if (!repository.existsById(id)) {
             throw new PetNotFoundException(id);
