@@ -7,7 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -34,13 +34,13 @@ public class JwtServiceUnitTest {
 
         String token = jwtService.generateToken(username);
 
-        Key key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
-        Date expire = Jwts.parserBuilder()
-                .setSigningKey(key)
-                .setClock(() -> Date.from(clock.instant()))
+        SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secret));
+        Date expire = Jwts.parser()
+                .verifyWith(key)
+                .clock(() -> Date.from(clock.instant()))
                 .build()
-                .parseClaimsJws(token)
-                .getBody()
+                .parseSignedClaims(token)
+                .getPayload()
                 .getExpiration();
 
         assertNotNull(token);

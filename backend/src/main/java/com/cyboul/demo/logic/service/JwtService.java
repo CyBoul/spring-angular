@@ -1,7 +1,8 @@
 package com.cyboul.demo.logic.service;
 
-
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.JwtParser;
+import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,7 +13,6 @@ import javax.crypto.SecretKey;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Optional;
 
 @Service
 public class JwtService {
@@ -36,46 +36,28 @@ public class JwtService {
     }
 
     public String generateToken(String username) {
-        // clock.instant() = more deterministic for Tests
         Instant now = clock.instant();
         return Jwts.builder()
-                .setSubject(username)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusMillis(validityTimeMillis)))
-                .signWith(secretKey, SignatureAlgorithm.HS256)
+                .subject(username)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusMillis(validityTimeMillis)))
+                .signWith(secretKey)
                 .compact();
     }
 
     public boolean validateToken(String token, UserDetails userDetails) {
         String username = extractUsername(token);
-        return username != null && userDetails != null && userDetails.getUsername() != null
-                && username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+        return username != null
+                && userDetails != null
+                && username.equals(userDetails.getUsername());
     }
 
     public String extractUsername(String token) {
-        return Optional.ofNullable(extractClaims(token))
-                .map(Claims::getSubject)
-                .orElse(null);
-    }
-
-    private Claims extractClaims(String token){
-        Claims claims;
         try {
-            claims = parser.parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            claims = e.getClaims();
+            return parser.parseSignedClaims(token).getPayload().getSubject();
+        } catch (JwtException e) {
+            return null;
         }
-        return claims;
-    }
-
-    private boolean isTokenExpired(String token) {
-        Claims claims = extractClaims(token);
-        Date expiration = claims.getExpiration();
-
-        // clock.instant() = more deterministic for Tests
-        return expiration == null
-                || expiration.toInstant().isBefore(clock.instant());
     }
 
     private void validateSecret(String secret) {
@@ -89,9 +71,9 @@ public class JwtService {
     }
 
     private JwtParser buildParser(SecretKey secretKey) {
-        return Jwts.parserBuilder()
-                .setSigningKey(secretKey)
-                .setClock(() -> Date.from(clock.instant()))
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .clock(() -> Date.from(clock.instant()))
                 .build();
     }
 }

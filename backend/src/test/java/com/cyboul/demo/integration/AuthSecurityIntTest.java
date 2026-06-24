@@ -3,6 +3,7 @@ package com.cyboul.demo.integration;
 import com.cyboul.demo.config.JwtTestConfig;
 import com.cyboul.demo.config.NoDatabaseConfig;
 import com.cyboul.demo.config.TestUsersConfig;
+import com.cyboul.demo.logic.data.PetRepository;
 import com.cyboul.demo.logic.service.AdoptionService;
 import com.cyboul.demo.logic.service.JwtService;
 import com.cyboul.demo.logic.service.PetService;
@@ -57,6 +58,9 @@ public class AuthSecurityIntTest {
 
     @MockitoBean
     PetService petService;
+
+    @MockitoBean
+    PetRepository petRepository;
 
     @MockitoBean
     AdoptionService adoptionService;
