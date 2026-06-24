@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-@Profile("!test") // temporary solve Bean conflict in test env
 @Service
+@Profile("!test")
 public class UserService implements UserDetailsService {
 
     private final UserRepository userRepository;

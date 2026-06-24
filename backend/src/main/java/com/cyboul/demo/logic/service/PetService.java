@@ -18,10 +18,12 @@ public class PetService {
         this.repository = repository;
     }
 
+    @Transactional(readOnly = true)
     public List<PetDTO> findAll() {
         return repository.findAll().stream().map(PetDTO::from).toList();
     }
 
+    @Transactional(readOnly = true)
     public PetDTO findById(Long id) {
         return PetDTO.from(getEntity(id));
     }
@@ -48,11 +50,7 @@ public class PetService {
         repository.deleteById(id);
     }
 
-    public List<Pet> findAllEntities() {
-        return repository.findAll();
-    }
-
-    public Pet getEntity(Long id) {
+    private Pet getEntity(Long id) {
         return repository.findById(id).orElseThrow(() -> new PetNotFoundException(id));
     }
 }

@@ -6,12 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.hateoas.RepresentationModel;
 
 @Getter
 @Setter
 @Entity
-public class Pet extends RepresentationModel<Pet> {
+public class Pet {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -54,7 +54,7 @@ public class JsonDataLoader implements CommandLineRunner {
     }
 
     private void createUsers() {
-        if( userRepository.findAll().isEmpty() ) {
+        if( userRepository.count() == 0 ) {
             try (InputStream is = usersResource.getInputStream()) {
                 Users users = objMapper.readValue(is, Users.class);
                 users.users().forEach(u -> {
@@ -74,7 +74,7 @@ public class JsonDataLoader implements CommandLineRunner {
     }
 
     private void createPets() {
-        if( petRepository.findAll().isEmpty() ){
+        if( petRepository.count() == 0 ){
             try (InputStream is = petsResource.getInputStream()) {
                 Pets pets = objMapper.readValue(is, Pets.class);
                 log.info("Reading and injecting {} pets from JSON into the database", pets.pets().size());

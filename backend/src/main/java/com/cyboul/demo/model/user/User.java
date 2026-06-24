@@ -27,11 +27,13 @@ public class User {
     public User(){}
 
     @JsonCreator
-    public User(@NotNull Long id, @NotEmpty String username, @NotEmpty String password, @NotEmpty String email) {
+    public User(@NotNull Long id, @NotEmpty String username, @NotEmpty String password,
+                @NotEmpty String email, Role role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = role != null ? role : ROLE_USER;
     }
 
 }
