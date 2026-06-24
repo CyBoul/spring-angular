@@ -1,1 +1,21 @@
-/* You can add global styles to this file, and also import other style files */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --pet-primary: #6366f1;
+  --pet-primary-dark: #4f46e5;
+  --pet-bg: #f8fafc;
+  --pet-text: #1e293b;
+  --pet-text-muted: #64748b;
+  --pet-border: #e2e8f0;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: var(--pet-text);
+  background: var(--pet-bg);
+}

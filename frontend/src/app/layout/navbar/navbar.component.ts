@@ -1,55 +1,36 @@
-import { Component } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Component, DestroyRef, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { ButtonModule } from 'primeng/button';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, ButtonModule],
+  imports: [RouterLink, RouterLinkActive, ButtonModule],
   template: `
     <nav class="navbar">
       <span class="brand" routerLink="/pets">🐾 PetAdopt</span>
       <div class="nav-links">
-        <a routerLink="/pets">Pets</a>
+        <a routerLink="/pets" routerLinkActive="active"
+           [routerLinkActiveOptions]="{ exact: true }">Pets</a>
         @if (auth.isAdmin()) {
-          <a routerLink="/admin/pets">Admin</a>
+          <a routerLink="/admin/pets" routerLinkActive="active">Admin</a>
         }
-        <p-button label="Logout" severity="secondary" size="small" (onClick)="logout()" />
+        <p-button label="Logout" severity="secondary" size="small"
+                  icon="pi pi-sign-out" (onClick)="logout()" />
       </div>
     </nav>
   `,
-  styles: [`
-    .navbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0.75rem 1.5rem;
-      background: var(--p-primary-color, #6366f1);
-      color: white;
-    }
-    .brand {
-      font-size: 1.2rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-    }
-    .nav-links a {
-      color: white;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .nav-links a:hover { text-decoration: underline; }
-  `]
+  styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
+  private destroyRef = inject(DestroyRef);
+
   constructor(public auth: AuthService, private router: Router) {}
 
   logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+    this.auth.logout()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.router.navigate(['/login']));
   }
 }

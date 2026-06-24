@@ -1,0 +1,137 @@
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.login-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ---- hero panel ---- */
+.login-hero {
+  flex: 0 0 44%;
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 40%, #7c3aed 70%, #a78bfa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.07);
+
+  &-1 { width: 340px; height: 340px; top: -90px; right: -70px; }
+  &-2 { width: 220px; height: 220px; bottom: 50px; left: -60px; }
+  &-3 {
+    width: 130px; height: 130px; top: 48%; right: 18%;
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  color: white;
+  max-width: 380px;
+
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    line-height: 1.12;
+    margin: 0 0 1rem;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    font-size: 1.05rem;
+    line-height: 1.65;
+    opacity: 0.85;
+    margin: 0 0 2.5rem;
+  }
+}
+
+.hero-brand {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.hero-animals { display: flex; gap: 0.75rem; }
+
+.animal-bubble {
+  font-size: 1.75rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s ease;
+
+  &:hover { transform: scale(1.14) rotate(-4deg); }
+}
+
+/* ---- form side ---- */
+.login-form-side {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: #fff;
+}
+
+.form-wrapper {
+  width: 100%;
+  max-width: 380px;
+  animation: fadeInUp 0.5s ease-out;
+
+  h2 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 0.4rem;
+    letter-spacing: -0.02em;
+    color: #1e293b;
+  }
+}
+
+.form-subtitle {
+  color: #64748b;
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: #374151;
+}
+
+/* ---- responsive ---- */
+@media (max-width: 768px) {
+  .login-container { flex-direction: column; }
+
+  .login-hero {
+    flex: 0 0 auto;
+    padding: 2.5rem 1.5rem;
+    min-height: auto;
+  }
+  .hero-content h1 { font-size: 1.75rem; }
+  .hero-content p   { margin-bottom: 1.5rem; }
+  .hero-animals     { display: none; }
+}

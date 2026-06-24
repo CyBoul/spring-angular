@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export interface Adoption {
   id: number;
@@ -12,7 +13,7 @@ export interface Adoption {
 @Injectable({ providedIn: 'root' })
 export class AdoptionService {
 
-  private readonly url = '/api/adoptions';
+  private readonly url = `${environment.apiBaseUrl}/adoptions`;
 
   constructor(private http: HttpClient) {}
 

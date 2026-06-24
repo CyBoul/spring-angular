@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { Pet, AnimalType } from '../../models/pet.model';
 import { PetService } from '../../services/pet.service';
 import { TableModule } from 'primeng/table';
@@ -15,15 +16,18 @@ import { ConfirmationService, MessageService } from 'primeng/api';
 const ANIMAL_TYPES: { label: string; value: AnimalType }[] = [
   { label: 'Dog', value: 'DOG' },
   { label: 'Cat', value: 'CAT' },
-  { label: 'Bird', value: 'BIRD' },
-  { label: 'Rabbit', value: 'RABBIT' },
-  { label: 'Other', value: 'OTHER' },
+  { label: 'Wolf', value: 'WOLF' },
+  { label: 'Tiger', value: 'TIGER' },
+  { label: 'Panda', value: 'PANDA' },
+  { label: 'Eagle', value: 'EAGLE' },
+  { label: 'Racoon', value: 'RACOON' },
+  { label: 'Unknown', value: 'UNKNOWN' },
 ];
 
 @Component({
   selector: 'app-admin-pets',
   imports: [
-    FormsModule,
+    ReactiveFormsModule,
     TableModule, ButtonModule, DialogModule, ConfirmDialogModule,
     InputTextModule, TextareaModule, SelectModule, ToastModule
   ],
@@ -49,7 +53,7 @@ const ANIMAL_TYPES: { label: string; value: AnimalType }[] = [
         <ng-template pTemplate="body" let-pet>
           <tr>
             <td>{{ pet.name }}</td>
-            <td>{{ pet.animalType }}</td>
+            <td>{{ pet.type }}</td>
             <td>{{ pet.description }}</td>
             <td>
               <p-button icon="pi pi-pencil" severity="secondary" size="small"
@@ -65,41 +69,45 @@ const ANIMAL_TYPES: { label: string; value: AnimalType }[] = [
     <p-dialog [(visible)]="dialogVisible"
               [header]="editingPet?.id ? 'Edit Pet' : 'New Pet'"
               [modal]="true" [style]="{ width: '400px' }">
-      <div class="field">
-        <label>Name</label>
-        <input pInputText [(ngModel)]="form.name" class="w-full" />
-      </div>
-      <div class="field">
-        <label>Type</label>
-        <p-select [options]="animalTypes" [(ngModel)]="form.animalType"
-                  optionLabel="label" optionValue="value" styleClass="w-full" />
-      </div>
-      <div class="field">
-        <label>Description</label>
-        <textarea pTextarea [(ngModel)]="form.description" rows="3" class="w-full"></textarea>
-      </div>
+      <form [formGroup]="form">
+        <div class="field">
+          <label>Name</label>
+          <input pInputText formControlName="name" class="w-full" />
+        </div>
+        <div class="field">
+          <label>Type</label>
+          <p-select [options]="types" formControlName="type"
+                    optionLabel="label" optionValue="value" styleClass="w-full" />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea pTextarea formControlName="description" rows="3" class="w-full"></textarea>
+        </div>
+      </form>
       <ng-template pTemplate="footer">
         <p-button label="Cancel" severity="secondary" (onClick)="dialogVisible = false" />
-        <p-button label="Save" [loading]="saving" (onClick)="save()" />
+        <p-button label="Save" [loading]="saving" [disabled]="form.invalid" (onClick)="save()" />
       </ng-template>
     </p-dialog>
   `,
-  styles: [`
-    .page { padding: 2rem; }
-    .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-    h2 { margin: 0; }
-    .field { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
-    label { font-weight: 500; font-size: 0.9rem; }
-  `]
+  styleUrl: './admin-pets.component.scss'
 })
 export class AdminPetsComponent implements OnInit {
+  private destroyRef = inject(DestroyRef);
+  private fb = inject(FormBuilder);
+
   pets: Pet[] = [];
   loading = true;
   dialogVisible = false;
   saving = false;
   editingPet: Pet | null = null;
-  form: Partial<Pet> = {};
-  animalTypes = ANIMAL_TYPES;
+  types = ANIMAL_TYPES;
+
+  form = this.fb.nonNullable.group({
+    name:        ['', [Validators.required, Validators.maxLength(50)]],
+    type:        ['DOG' as AnimalType, [Validators.required]],
+    description: ['', [Validators.maxLength(300)]],
+  });
 
   constructor(
     private petService: PetService,
@@ -113,33 +121,39 @@ export class AdminPetsComponent implements OnInit {
 
   load(): void {
     this.loading = true;
-    this.petService.getAll().subscribe({
-      next: pets => { this.pets = pets; this.loading = false; },
-      error: () => { this.loading = false; }
-    });
+    this.petService.getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: pets => { this.pets = pets; this.loading = false; },
+        error: () => { this.loading = false; }
+      });
   }
 
   openNew(): void {
     this.editingPet = null;
-    this.form = { animalType: 'DOG' };
+    this.form.reset({ name: '', type: 'DOG', description: '' });
     this.dialogVisible = true;
   }
 
   openEdit(pet: Pet): void {
     this.editingPet = pet;
-    this.form = { ...pet };
+    this.form.patchValue({
+      name: pet.name,
+      type: pet.type,
+      description: pet.description ?? '',
+    });
     this.dialogVisible = true;
   }
 
   save(): void {
-    if (!this.form.name || !this.form.animalType) return;
+    if (this.form.invalid) return;
     this.saving = true;
-    const pet = this.form as Pet;
+    const pet = this.form.getRawValue() as Pet;
     const op = this.editingPet?.id
       ? this.petService.update(this.editingPet.id, pet)
       : this.petService.create(pet);
 
-    op.subscribe({
+    op.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => {
         this.toast.add({ severity: 'success', summary: 'Saved', detail: 'Pet saved.' });
         this.dialogVisible = false;
@@ -162,14 +176,16 @@ export class AdminPetsComponent implements OnInit {
 
   delete(pet: Pet): void {
     if (!pet.id) return;
-    this.petService.delete(pet.id).subscribe({
-      next: () => {
-        this.toast.add({ severity: 'success', summary: 'Deleted', detail: `${pet.name} removed.` });
-        this.load();
-      },
-      error: () => {
-        this.toast.add({ severity: 'error', summary: 'Error', detail: 'Could not delete pet.' });
-      }
-    });
+    this.petService.delete(pet.id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.toast.add({ severity: 'success', summary: 'Deleted', detail: `${pet.name} removed.` });
+          this.load();
+        },
+        error: () => {
+          this.toast.add({ severity: 'error', summary: 'Error', detail: 'Could not delete pet.' });
+        }
+      });
   }
 }
